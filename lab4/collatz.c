@@ -45,8 +45,9 @@ void parallel_collatz(struct arguments args) {
     }
    
     int status;
-    wait(&status);
-    printf("Done. Terminal will flush. Status = %d\n", status);
+    while (waitpid(-1, &status, 0) != -1) {}
+
+    printf("Done. Status = %d\n", status);
 }
 
 pid_t spawn_collatz_proc(int n) {

@@ -24,11 +24,11 @@ bool isAvailableDirectory(char* dir) {
 
 ssize_t copy(char* src, char* dst) {
     struct stat sb;
-    if (stat(src, &sb) == -1) return -1;
+    if (stat(src, &sb) == -1) { perror("stat failed"); return -1; }
 
     int srcFd = open(src, O_RDONLY);
     int dstFd = open(dst, O_WRONLY | O_CREAT | O_TRUNC, sb.st_mode);
-    if (srcFd == -1 || dstFd == -1) return -1;
+    if (srcFd == -1 || dstFd == -1) { perror("could not open files"); return -1; }
     
     ssize_t ret = sb.st_size;
     size_t blockSize = 512;
@@ -36,12 +36,14 @@ ssize_t copy(char* src, char* dst) {
     for (blkcnt_t i = 0; i < sb.st_blocks; i++) {
         ssize_t readBytes = read(srcFd, buf, blockSize);
         if (readBytes == -1) {
+            perror("read failed");
             ret = -1;
             break;
         } 
 
         ssize_t writtenBytes = write(dstFd, buf, readBytes);
         if (writtenBytes == -1) {
+            perror("write failed");
             ret = -1;
             break;
         }
